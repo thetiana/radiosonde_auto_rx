@@ -133,8 +133,11 @@ WORKDIR /opt/auto_rx
 # Ensure scripts from Python packages are in PATH.
 ENV PATH=/root/.local/bin:$PATH
 
+# Ensure helper scripts are executable.
+RUN chmod +x /opt/auto_rx/docker-entrypoint.sh /opt/auto_rx/generate_station_cfg.py
+
 # Use tini as init.
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/opt/auto_rx/docker-entrypoint.sh"]
 
 # Run auto_rx.py.
 CMD ["python3", "/opt/auto_rx/auto_rx.py"]
