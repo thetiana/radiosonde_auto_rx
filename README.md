@@ -57,3 +57,31 @@ Radiosonde telemetry data captured via this software and uploaded into the [Sond
 Telemetry data uploaded into the APRS-IS network is generally considered to be released into the public domain. 
 
 By uploading data into these systems (by enabling the relevant uploaders within the `station.cfg` file) you as the user agree for your data to be made available under these licenses. Note that uploading to Sondehub is enabled by default. 
+
+## Docker configuration
+
+The container image now generates `/opt/auto_rx/station.cfg` when the container starts. It uses `auto_rx/station.cfg.example` as the base template, keeps that example file unchanged, and only replaces settings for environment variables that are actually present.
+
+Environment variables map to config entries using this format:
+
+* `AUTORX_<SECTION>__<KEY>`
+* `AUTORX_<SECTION>_<KEY>`
+
+Both forms are supported. Section names and keys are normalized to uppercase, with non-alphanumeric characters replaced by `_`.
+
+Examples:
+
+* `AUTORX_HABITAT__UPLOADER_CALLSIGN=N0CALL`
+* `AUTORX_LOCATION__STATION_LAT=-34.9285`
+* `AUTORX_LOCATION__STATION_LON=138.6007`
+* `AUTORX_SEARCH_PARAMS__MIN_FREQ=400.05`
+* `AUTORX_SEARCH_PARAMS__MAX_FREQ=406.0`
+
+Values are written into `station.cfg` exactly as provided, so booleans, numbers, strings, and JSON-style lists should already be formatted as valid `station.cfg` values.
+
+If you prefer to provide a complete config file, mount one either:
+
+* directly at `/opt/auto_rx/station.cfg`, or
+* at `/config/station.cfg` and let the entrypoint copy it into place.
+
+If neither mounted config path exists, the entrypoint falls back to generating `station.cfg` from the example template and the provided environment variables.
